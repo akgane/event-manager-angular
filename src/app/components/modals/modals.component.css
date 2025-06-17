@@ -1,0 +1,50 @@
+.modal-container{
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  z-index: 50;
+  left: 0;
+  top: 0;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .button-container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    font-size: 16px;
+
+    button {
+      border-radius: 5px;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .submit-button {
+      width: 40%;
+      background-color: royalblue;
+      color: white;
+      font-weight: bold;
+    }
+
+    .cancel-button {
+      width: 30%;
+      background-color: white;
+      border: 1px solid darkgray;
+      color: black;
+    }
+
+    .delete-button {
+      width: 30%;
+      background-color: red;
+      color: white;
+      font-weight: bold;
+    }
+  }
+}

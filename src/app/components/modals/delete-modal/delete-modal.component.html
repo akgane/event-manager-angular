@@ -1,0 +1,9 @@
+<div class="modal-content" >
+  <div class="delete-body" (click)="$event.preventDefault(); $event.stopPropagation()">
+    <p>Delete <b>"{{ event?.title }}"</b></p>
+    <div class="button-container">
+      <button class="cancel-button" (click)="closeModal()">Cancel</button>
+      <button class="delete-button" (click)="submitDeletion(event)">Yes, delete</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+<table>
+  <colgroup>
+    <col style="width: 5%">
+    <col style="width: 37%">
+    <col style="width: 16%">
+    <col style="width: 16%">
+    <col style="width: 16%">
+    <col style="width: 5%">
+    <col style="width: 5%">
+  </colgroup>
+  <thead>
+  <tr>
+    <th (click)="setSort('')" style="text-align: center">#</th>
+    <th (click)="setSort('title')" style="text-align: left">Title {{ getSortSymbol('title') }}</th>
+    <th (click)="setSort('date')">Date {{ getSortSymbol('date') }}</th>
+    <th (click)="setSort('category')">Category {{ getSortSymbol('category') }}</th>
+    <th (click)="setSort('status')">Status {{ getSortSymbol('status') }}</th>
+    <th style="cursor: auto">Edit</th>
+    <th style="cursor: auto">Delete</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let event of eventsToShow; let i = index">
+    <app-table-row [event]="event" [index]="i" [openModal]="openModal"></app-table-row>
+  </tr>
+  </tbody>
+</table>

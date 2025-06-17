@@ -1,0 +1,241 @@
+import {MyEvent} from '../models/event.model';
+import {BehaviorSubject, combineLatest} from 'rxjs';
+import {mockEvents} from '../data/mock-data';
+import {map} from 'rxjs/operators';
+import {isBefore, parseISO} from 'date-fns';
+import {Injectable} from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EventsService {
+  private _eventsSubject = new BehaviorSubject<MyEvent[]>(mockEvents);
+
+  private _filters = new BehaviorSubject<{ field: string, value: string }[]>([{
+      field: 'category',
+      value: 'All'
+    }, {
+      field: 'status',
+      value: 'All'
+    }]);
+
+  private _pagination = new BehaviorSubject<{ maxEvents: number, page: number, maxPages: number }>({
+    maxEvents: 10,
+    page: 0,
+    maxPages: Math.ceil(this._eventsSubject.value.length / 10)
+  });
+
+  private _sorting = new BehaviorSubject<{ field: string, direction: string }>({
+    field: '',
+    direction: 'asc',
+  });
+
+  private _modalSettings = new BehaviorSubject<{ event: MyEvent | null, mode: string}>({
+    event: null,
+    mode: 'closed'
+  });
+
+  public events$ = this._eventsSubject.asObservable();
+  public filters$ = this._filters.asObservable();
+  public pagination$ = this._pagination.asObservable();
+  public sorting$ = this._sorting.asObservable();
+
+  public modalSettings$ = this._modalSettings.asObservable();
+
+  //region events
+
+  private filteredEvents$ = combineLatest([
+    this.events$,
+    this.filters$
+  ]).pipe(
+    map(([events, filters]) => {
+      return filters.reduce(
+        (filteredEvents, f) => this.filterEvents(filteredEvents, f.field, f.value),
+        events
+      );
+    })
+  );
+
+  private pagedEvents$ = combineLatest([
+    this.filteredEvents$,
+    this.pagination$
+  ]).pipe(
+    map(([events, pagination]) => {
+      return events.slice(pagination.page * pagination.maxEvents, (pagination.page + 1) * pagination.maxEvents);
+    })
+  );
+
+  public sortedEvents$ = combineLatest([
+    this.pagedEvents$,
+    this.sorting$
+  ]).pipe(
+    map(([events, sorting]) => {
+      return this.sortEvents(events, sorting.field, sorting.direction);
+    })
+  );
+
+  //endregion events
+
+  //region gui
+
+  setFilter(field: string, value: string) {
+    const newState = this._filters.value.map(f =>
+      f.field === field
+        ? {field, value: value}
+        : f);
+    this._filters.next(newState);
+    return {category: newState[0], status: newState[1]};
+  }
+
+  setMaxEvents(count: number){
+    if(count < 0) return;
+
+    const p = this._pagination.value;
+    const newPage = Math.floor((p.page * p.maxEvents) / count);
+
+    const newPaginationState = {
+      page: newPage,
+      maxPages: Math.ceil(this._eventsSubject.value.length / count),
+      maxEvents: count
+    };
+
+    this._pagination.next(newPaginationState);
+    return {...newPaginationState};
+  }
+
+  setPage(next: boolean){
+    const p = this._pagination.value;
+
+    if((next && p.page === p.maxPages - 1) || (!next && p.page === 0)) return;
+
+    const newPage = (p.page + (next ? 1 : -1));
+    const newPaginationState = {
+      page: newPage,
+      maxPages: p.maxPages,
+      maxEvents: p.maxEvents,
+    }
+
+    this._pagination.next(newPaginationState);
+
+    return {...newPaginationState};
+  }
+
+  setSort(field: string) {
+    const s = this._sorting.value;
+    const newState = {
+      field,
+      direction: s.field === field ? (s.direction === 'asc' ? 'desc' : 'asc') : 'asc'
+    }
+    this._sorting.next(newState);
+    return {...newState};
+  }
+
+  //endregion gui
+
+  //region modal
+
+  openModal(mode: string, event?: MyEvent) {
+    this._modalSettings.next({
+      event: event || null,
+      mode
+    })
+  }
+
+  closeModal(){
+    this._modalSettings.next({
+      event: null,
+      mode: 'closed'
+    });
+  }
+
+  addEvent(event: MyEvent){
+    console.log('new event:', event)
+    this._eventsSubject.next([event, ...this._eventsSubject.value])
+  }
+
+  editEvent(event: MyEvent){
+    this._eventsSubject.next(this._eventsSubject.value.map((e) => e.uid === event.uid ? event : e));
+  }
+
+  deleteEvent(event: MyEvent){
+    this._eventsSubject.next(this._eventsSubject.value.filter(e => e.uid !== event.uid ));
+  }
+
+  //endregion modal
+
+  //region misc
+
+  filterEvents(events: MyEvent[], field: string, value: string): MyEvent[] {
+    switch (field) {
+      case 'category':
+        return events.filter(e =>
+          value === 'All'
+            ? true
+            : e.category === value);
+      case 'status':
+        return events.filter(e =>
+          value === 'All'
+            ? true
+            : e.status === value);
+      default:
+        console.log('Unknown filter field:', field);
+        return events;
+    }
+  }
+
+  sortEvents(events: MyEvent[], field: string, direction: string): MyEvent[] {
+    switch (field) {
+      case 'title':
+        return [...events]
+          .sort(
+            (a, b) => {
+              return direction === 'asc'
+                ? a.title.localeCompare(b.title)
+                : b.title.localeCompare(a.title);
+            });
+      case 'date':
+        return [...events]
+          .sort(
+            (a, b) => {
+              const aValue = parseISO(a.date);
+              const bValue = parseISO(b.date);
+
+              return direction === 'asc'
+                ? (isBefore(aValue, bValue) ? 0 : 1)
+                : (isBefore(bValue, aValue) ? 0 : 1);
+            });
+      case 'category':
+        return [...events]
+          .sort(
+            (a, b) => {
+              return direction === 'asc'
+                ? a.category.localeCompare(b.category)
+                : b.category.localeCompare(a.category);
+            });
+      case 'status':
+        return [...events]
+          .sort(
+            (a, b) => {
+              return direction === 'asc'
+                ? a.status.localeCompare(b.status)
+                : b.status.localeCompare(a.status);
+            });
+      default:
+        return [...events];
+    }
+  }
+
+  //endregion misc
+
+  //region debug
+
+  debugFilters(){
+    return this._filters;
+  }
+
+  debugPagination(){
+    return this._pagination;
+  }
+
+  //endregion debug
+}

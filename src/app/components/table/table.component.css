@@ -1,0 +1,19 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: sans-serif;
+  text-align: center;
+
+  thead{
+    background-color: lightslategray;
+  }
+
+  th {
+    text-transform: uppercase;
+    padding: 10px 0 10px 0;
+  }
+
+  td{
+    padding: 10px 0 10px 0;
+  }
+}

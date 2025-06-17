@@ -1,0 +1,71 @@
+<div
+  class="modal-content"
+  (click)="$event.preventDefault(); $event.stopPropagation()">
+  <div class="event-top">
+    <p>{{ getModalTitle() }}</p>
+    <a (click)="closeModal()">X</a>
+  </div>
+  <div class="event-body">
+    <form [formGroup]="modalForm" (ngSubmit)="submitForm()">
+
+      <div class="form-field">
+        <div class="form-info">
+          <label for="title">Title</label>
+          <p *ngIf="errorsHandler.show" class="error-message">{{getError('title')}}</p>
+        </div>
+        <input type="text" formControlName="title" name="title" id="title" placeholder="Enter title">
+      </div>
+
+      <div class="form-field">
+
+        <div class="two-cols">
+          <div class="form-field">
+            <div class="form-info">
+              <label for="category">Category</label>
+              <p *ngIf="errorsHandler.show" class="error-message">{{getError('category')}}</p>
+            </div>
+            <select name="category" id="category" formControlName="category">
+              <option>Webinar</option>
+              <option>Meeting</option>
+              <option>Event</option>
+            </select>
+          </div>
+
+          <div class="form-field">
+            <div class="form-info">
+              <label for="status">Status</label>
+              <p *ngIf="errorsHandler.show" class="error-message">{{getError('status')}}</p>
+            </div>
+            <select name="status" id="status" formControlName="status">
+              <option>Planned</option>
+              <option>In Progress</option>
+              <option>Finished</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="form-field">
+        <div class="form-info">
+          <label for="date">Date</label>
+          <p *ngIf="errorsHandler.show" class="error-message">{{getError('date')}}</p>
+        </div>
+        <input type="date" id="date" name="date" formControlName="date">
+      </div>
+
+      <div class="form-field">
+        <div class="form-info">
+          <label for="description">Description</label>
+          <p *ngIf="errorsHandler.show" class="error-message">{{getError('description')}}</p>
+        </div>
+        <textarea name="description" id="description" placeholder="Event description"
+                  formControlName="description"></textarea>
+      </div>
+
+      <div class="button-container">
+        <button class="submit-button" (click)="submitForm()">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>

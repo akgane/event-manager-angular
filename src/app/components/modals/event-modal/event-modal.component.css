@@ -1,0 +1,84 @@
+.modal-content {
+  padding: 20px;
+  width: 25%;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  font-size: 16px;
+
+  .event-top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+
+    p {
+      font-weight: bold;
+      font-size: 24px;
+    }
+
+    a {
+      cursor: pointer;
+      font-size: x-large;
+    }
+  }
+
+  .event-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .form-field {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+
+      input, select, option, textarea {
+        border: 1px solid darkgray;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: white;
+      }
+
+      textarea {
+        height: 150px;
+        resize: none;
+        font-family: sans-serif;
+      }
+
+      label {
+        font-size: 20px;
+      }
+
+      .error-message {
+        color: red;
+        font-size: 14px;
+      }
+
+      .form-info{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        height: 30px;
+      }
+    }
+
+    .two-cols {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 20px;
+    }
+  }
+}

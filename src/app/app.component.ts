@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { EventsService } from './services/events.service';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,8 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'angular-event-manager-app';
+  constructor(private eventsService: EventsService) {
+  }
+
+  events = this.eventsService.sortedEvents$;
 }

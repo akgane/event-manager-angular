@@ -1,0 +1,13 @@
+<div class="modal-container" *ngIf="modalSettings.mode !== 'closed'" (click)="closeModal()">
+  <app-event-modal *ngIf="modalSettings.mode === 'add' || modalSettings.mode === 'edit'"
+                   [closeModal]="closeModal"
+                   [submitEvent]="submitEvent"
+                   [getModalTitle]="getModalTitle"
+                   [event]="modalSettings.event"
+                   [mode]="modalSettings.mode"></app-event-modal>
+  <app-delete-modal *ngIf="modalSettings.mode === 'delete'"
+  [event]="modalSettings.event"
+  [closeModal]="closeModal"
+  [submitDeletion]="submitDeletion">
+  </app-delete-modal>
+</div>

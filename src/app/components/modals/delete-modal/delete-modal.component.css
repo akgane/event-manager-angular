@@ -1,0 +1,22 @@
+.modal-content{
+  padding: 20px;
+  width: 25%;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  font-size: 16px;
+
+  .delete-body {
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+    width: 100%;
+
+    p {
+      text-align: center;
+      font-size: 20px;
+    }
+  }
+}
+
+

@@ -1,0 +1,48 @@
+<div class="container">
+  <div class="left-menu">
+    <a>Event Manager</a>
+    <button class="add-event-btn" (click)="openModal()">Add Event</button>
+
+    <div class="filter-container">
+      <label for="category-filter">Filter by <b>Category</b></label>
+      <select name="category-filer" id="category-filter" [(ngModel)]="categoryFilter"
+              (ngModelChange)="changeFilter('category', $event)">
+        <option value="All">All</option>
+        <option value="Event">Event</option>
+        <option value="Meeting">Meeting</option>
+        <option value="Webinar">Webinar</option>
+      </select>
+    </div>
+    <div class="filter-container">
+      <label for="status-filter">Filter by <b>Status</b></label>
+      <select name="status-filer" id="status-filter" [(ngModel)]="statusFilter"
+              (ngModelChange)="changeFilter('status', $event)">
+        <option value="All">All</option>
+        <option value="Planned">Planned</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Finished">Finished</option>
+      </select>
+    </div>
+    <button class="reset-filters-btn"
+            (click)="changeFilter('category', 'All'); changeFilter('status', 'All');"
+            [disabled]="categoryFilter === 'All' && statusFilter === 'All'">
+      Reset filters
+    </button>
+  </div>
+
+  <div class="pagination-container">
+    <div>
+      <select [(ngModel)]="pagination.maxEvents" (ngModelChange)="changeMaxEvents($event)">
+        <option value="10">10 events</option>
+        <option value="25">25 events</option>
+        <option value="50">50 events</option>
+        <option value="100">100 events</option>
+      </select>
+    </div>
+    <div class="pagination-selection">
+      <button (click)="changePage(false)" [disabled]="pagination.page <= 0">Prev</button>
+      <a>{{ pagination.page + 1 }}</a>
+      <button (click)="changePage(true)" [disabled]="pagination.page >= pagination.maxPages - 1">Next</button>
+    </div>
+  </div>
+</div>
