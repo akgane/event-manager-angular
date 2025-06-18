@@ -10,10 +10,17 @@ table {
 
   th {
     text-transform: uppercase;
-    padding: 10px 0 10px 0;
+    padding: 10px 5px;
+    cursor: pointer;
+    text-align: start;
   }
 
   td{
-    padding: 10px 0 10px 0;
+    padding: 10px 5px;
+    text-align: start;
+  }
+
+  tr{
+    border-bottom: 1px solid lightslategray;
   }
 }

@@ -2,8 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {MyEvent} from '../../../models/event.model';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {v4 as uuidv4} from 'uuid';
-import {Observable} from 'rxjs';
-import {isBefore, isEqual, isSameDay} from 'date-fns';
+import {isBefore, isSameDay} from 'date-fns';
 
 
 @Component({

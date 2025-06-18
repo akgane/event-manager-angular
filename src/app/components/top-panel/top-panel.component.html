@@ -33,15 +33,15 @@
   <div class="pagination-container">
     <div>
       <select [(ngModel)]="pagination.maxEvents" (ngModelChange)="changeMaxEvents($event)">
-        <option value="10">10 events</option>
-        <option value="25">25 events</option>
-        <option value="50">50 events</option>
-        <option value="100">100 events</option>
+        <option value=10>10 events</option>
+        <option value=25>25 events</option>
+        <option value=50>50 events</option>
+        <option value=100>100 events</option>
       </select>
     </div>
     <div class="pagination-selection">
       <button (click)="changePage(false)" [disabled]="pagination.page <= 0">Prev</button>
-      <a>{{ pagination.page + 1 }}</a>
+      <input type="number" pattern="[0-9]*" value="{{(pagination.page + 1)}}" (change)="setPage($event)">
       <button (click)="changePage(true)" [disabled]="pagination.page >= pagination.maxPages - 1">Next</button>
     </div>
   </div>

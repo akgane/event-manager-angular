@@ -99,11 +99,13 @@ export class EventsService {
       maxEvents: count
     };
 
+    console.log('setMaxEvents', newPaginationState)
+
     this._pagination.next(newPaginationState);
     return {...newPaginationState};
   }
 
-  setPage(next: boolean){
+  changePage(next: boolean){
     const p = this._pagination.value;
 
     if((next && p.page === p.maxPages - 1) || (!next && p.page === 0)) return;
@@ -113,11 +115,28 @@ export class EventsService {
       page: newPage,
       maxPages: p.maxPages,
       maxEvents: p.maxEvents,
-    }
+    };
 
     this._pagination.next(newPaginationState);
 
     return {...newPaginationState};
+  }
+
+  setPage(page: number){
+    const p = this._pagination.value;
+
+    if(page < 0 || (page >= p.maxPages)) return {changed: false, pagination: {...p}};
+
+    const newPaginationState = {
+      page,
+      maxPages: p.maxPages,
+      maxEvents: p.maxEvents,
+    };
+
+    console.log('setPage', newPaginationState);
+
+    this._pagination.next(newPaginationState);
+    return {changed: true, pagination: {...newPaginationState}};
   }
 
   setSort(field: string) {

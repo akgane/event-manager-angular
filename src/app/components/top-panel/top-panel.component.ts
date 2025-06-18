@@ -25,12 +25,21 @@ export class TopPanelComponent {
     this.statusFilter = newState.status.value;
   }
 
-  changeMaxEvents(count: number){
-    this.pagination = this.eventsService.setMaxEvents(count);
+  changeMaxEvents(count: string){
+    this.pagination = this.eventsService.setMaxEvents(parseInt(count));
   }
 
   changePage(next: boolean){
-    this.pagination = this.eventsService.setPage(next);
+    this.pagination = this.eventsService.changePage(next);
+  }
+
+  setPage(page: any){
+    console.log('setPage called with page', page.target.value);
+    const result = this.eventsService.setPage(page.target.value - 1);
+
+    this.pagination = result.pagination;
+
+    if(!result.changed) page.target.value = result.pagination.page + 1;
   }
 
   openModal(){
