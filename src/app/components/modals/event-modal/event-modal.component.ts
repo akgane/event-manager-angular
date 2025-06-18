@@ -3,6 +3,7 @@ import {MyEvent} from '../../../models/event.model';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {v4 as uuidv4} from 'uuid';
 import {isBefore, isSameDay} from 'date-fns';
+import {BehaviorSubject} from 'rxjs';
 
 
 @Component({
@@ -18,6 +19,10 @@ export class EventModalComponent implements OnInit {
   @Input() getModalTitle: () => string;
   @Input() mode: string;
   @Input() event: MyEvent | null;
+
+  private _isLoading = new BehaviorSubject<boolean>(false);
+
+  public isLoading$ = this._isLoading.asObservable();
 
   constructor(private formBuilder: FormBuilder) {
   }
@@ -46,6 +51,7 @@ export class EventModalComponent implements OnInit {
     show: false,
     errors: []
   };
+
 
   fieldValidations = [
     {
@@ -104,6 +110,7 @@ export class EventModalComponent implements OnInit {
   ];
 
   submitForm() {
+    this._isLoading.next(true);
     this.errorsHandler = {
       show: true,
       errors: this.getErrors()
@@ -127,7 +134,6 @@ export class EventModalComponent implements OnInit {
     };
 
     this.submitEvent(event);
-    this.closeModal();
   }
 
   getError(field: string) {

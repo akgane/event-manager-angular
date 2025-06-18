@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {EventsService} from '../../services/events.service';
 import {MyEvent} from '../../models/event.model';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Component({
   selector: 'app-modals',
@@ -14,25 +15,39 @@ export class ModalsComponent {
     });
   }
 
+  private _isLoadingSubject = new BehaviorSubject<boolean>(false);
+
   modalSettings = {
     mode: 'close',
     event: null
   };
 
+
   closeModal = () => {
+    // if(!this._isLoadingSubject.value) this.eventsService.closeModal();
     this.eventsService.closeModal();
   }
 
   submitEvent = (event: MyEvent) => {
+    let operation$ : Observable<any>;
+    this._isLoadingSubject.next(true);
+
     switch (this.modalSettings.mode) {
       case 'add':
-        this.eventsService.addEvent(event);
+        operation$ = this.eventsService.addEvent(event);
         break;
       case 'edit':
-        this.eventsService.editEvent(event);
+        operation$ = this.eventsService.editEvent(event);
         break;
+      default:
+        return;
     }
-    this.closeModal();
+
+    operation$.subscribe(() => {
+      console.log(123);
+      this._isLoadingSubject.next(false);
+      this.closeModal();
+    })
   }
 
   submitDeletion = (event: MyEvent) => {

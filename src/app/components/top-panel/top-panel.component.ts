@@ -9,6 +9,10 @@ import { EventsService } from 'src/app/services/events.service';
 export class TopPanelComponent {
   constructor(private eventsService: EventsService) {
     this.pagination = this.eventsService.setMaxEvents(10);
+
+    eventsService.pagination$.subscribe(p => {
+      this.pagination = p;
+    })
   }
 
   categoryFilter ='All';

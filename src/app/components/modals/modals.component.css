@@ -1,4 +1,4 @@
-.modal-container{
+.modal-container {
   position: fixed;
   height: 100%;
   width: 100%;
@@ -44,6 +44,23 @@
       width: 30%;
       background-color: red;
       color: white;
+      font-weight: bold;
+    }
+  }
+
+  .progress-bar-container {
+    width: 100%;
+    position: relative;
+
+    progress {
+      width: 100%;
+    }
+
+    p {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
       font-weight: bold;
     }
   }

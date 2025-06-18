@@ -1,15 +1,15 @@
 import {MyEvent} from '../models/event.model';
-import {BehaviorSubject, combineLatest} from 'rxjs';
-import {mockEvents} from '../data/mock-data';
-import {map} from 'rxjs/operators';
+import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
+import {map, tap} from 'rxjs/operators';
 import {isBefore, parseISO} from 'date-fns';
-import {Injectable} from '@angular/core';
+import {Injectable, OnInit} from '@angular/core';
+import {StorageService} from './storage.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventsService {
-  private _eventsSubject = new BehaviorSubject<MyEvent[]>(mockEvents);
+  private _eventsSubject = new BehaviorSubject<MyEvent[]>([]);
 
   private _filters = new BehaviorSubject<{ field: string, value: string }[]>([{
     field: 'category',
@@ -41,6 +41,34 @@ export class EventsService {
   public sorting$ = this._sorting.asObservable();
 
   public modalSettings$ = this._modalSettings.asObservable();
+
+  constructor(private storageService: StorageService) {
+    this.setEvents();
+
+    this.events$.subscribe((events) => {
+      const p = this._pagination.value;
+      this._pagination.next({
+        ...p,
+        maxPages: Math.ceil(events.length / p.maxEvents)
+      })
+    })
+
+    // this.events$.subscribe((e) => {
+    //   console.log('events$ changed')
+    // })
+    //
+    // this.filteredEvents$.subscribe((e) => {
+    //   console.log('filteredEvents$ changed')
+    // })
+    //
+    // this.pagedEvents$.subscribe((e) => {
+    //   console.log('pagedEvents$ changed')
+    // })
+    //
+    // this.sortedEvents$.subscribe((e) => {
+    //   console.log('sortedEvents$ changed')
+    // })
+  }
 
   //region events
 
@@ -176,17 +204,49 @@ export class EventsService {
     });
   }
 
-  addEvent(event: MyEvent) {
-    console.log('new event:', event);
-    this._eventsSubject.next([event, ...this._eventsSubject.value]);
+  addEvent(event: MyEvent) : Observable<boolean> {
+    // this.storageService.addEvent(event).subscribe(() => {
+    //   this.setEvents();
+    // })
+
+    return this.storageService.addEvent(event).pipe(
+      tap(() => {
+        this.setEvents()
+      }),
+      map(() => true)
+    );
   }
 
-  editEvent(event: MyEvent) {
-    this._eventsSubject.next(this._eventsSubject.value.map((e) => e.uid === event.uid ? event : e));
+  editEvent(event: MyEvent) : Observable<boolean> {
+    // this.storageService.editEvent(event).subscribe(() => {
+    //   this.setEvents();
+    // });
+
+    return this.storageService.editEvent(event).pipe(
+      tap(() => {
+        this.setEvents()
+      }),
+      map(() => true)
+    );
   }
 
   deleteEvent(event: MyEvent) {
-    this._eventsSubject.next(this._eventsSubject.value.filter(e => e.uid !== event.uid));
+    this.storageService.deleteEvent(event).subscribe(() => {
+      console.log('event deleted');
+      this.setEvents();
+    })
+  }
+
+  private setEvents(){
+    this.storageService.getEvents().subscribe(events => {
+      this._eventsSubject.next(events);
+
+      const p = this._pagination.value;
+      this._pagination.next({
+        ...p,
+        maxPages: Math.ceil(events.length / p.maxEvents),
+      })
+    })
   }
 
   //endregion modal
