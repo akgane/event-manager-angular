@@ -99,8 +99,6 @@ export class EventsService {
       maxEvents: count
     };
 
-    console.log('setMaxEvents', newPaginationState)
-
     this._pagination.next(newPaginationState);
     return {...newPaginationState};
   }
@@ -125,15 +123,19 @@ export class EventsService {
   setPage(page: number){
     const p = this._pagination.value;
 
-    if(page < 0 || (page >= p.maxPages)) return {changed: false, pagination: {...p}};
+    if(page < 0){
+      return {changed: !(page < 0 && p.page === 0), pagination: {...p, page: 0}};
+    }
+    else if(page >= p.maxPages){
+      return {changed: !(page > p.maxPages - 1 && p.page === p.maxPages - 1), pagination: {...p, page: p.maxPages - 1}};
+    }
+    else if (page === p.page) return {changed: false, pagination: {...p}};
 
     const newPaginationState = {
-      page,
+      page: page,
       maxPages: p.maxPages,
       maxEvents: p.maxEvents,
     };
-
-    console.log('setPage', newPaginationState);
 
     this._pagination.next(newPaginationState);
     return {changed: true, pagination: {...newPaginationState}};

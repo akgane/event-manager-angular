@@ -12,6 +12,7 @@ import { DebugPanelComponent } from './components/debug-panel/debug-panel.compon
 import { EventModalComponent } from './components/modals/event-modal/event-modal.component';
 import { DeleteModalComponent } from './components/modals/delete-modal/delete-modal.component';
 import { ModalsComponent } from './components/modals/modals.component';
+import { PaginationButtonComponent } from './components/top-panel/pagination-button/pagination-button.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,8 @@ import { ModalsComponent } from './components/modals/modals.component';
     DebugPanelComponent,
     EventModalComponent,
     DeleteModalComponent,
-    ModalsComponent
+    ModalsComponent,
+    PaginationButtonComponent
   ],
   imports: [
     BrowserModule,

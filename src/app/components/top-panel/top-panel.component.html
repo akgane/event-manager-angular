@@ -40,8 +40,13 @@
       </select>
     </div>
     <div class="pagination-selection">
+    </div>
+    <div class="pagination-selection">
       <button (click)="changePage(false)" [disabled]="pagination.page <= 0">Prev</button>
-      <input type="number" pattern="[0-9]*" value="{{(pagination.page + 1)}}" (change)="setPage($event)">
+      <div class="page-container">
+          <input type="number" pattern="[0-9]*" value="{{(pagination.page + 1)}}" (change)="setPage($event)">
+          <div class="max-pages"> of {{pagination.maxPages}}</div>
+      </div>
       <button (click)="changePage(true)" [disabled]="pagination.page >= pagination.maxPages - 1">Next</button>
     </div>
   </div>

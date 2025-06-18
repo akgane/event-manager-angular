@@ -34,12 +34,10 @@ export class TopPanelComponent {
   }
 
   setPage(page: any){
-    console.log('setPage called with page', page.target.value);
     const result = this.eventsService.setPage(page.target.value - 1);
-
     this.pagination = result.pagination;
 
-    if(!result.changed) page.target.value = result.pagination.page + 1;
+    page.target.value = result.pagination.page + 1;
   }
 
   openModal(){
