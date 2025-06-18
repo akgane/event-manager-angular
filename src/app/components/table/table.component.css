@@ -3,6 +3,7 @@ table {
   border-collapse: collapse;
   font-family: sans-serif;
   text-align: center;
+  border: 1px solid lightslategray;
 
   thead{
     background-color: lightslategray;

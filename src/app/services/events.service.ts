@@ -12,12 +12,12 @@ export class EventsService {
   private _eventsSubject = new BehaviorSubject<MyEvent[]>(mockEvents);
 
   private _filters = new BehaviorSubject<{ field: string, value: string }[]>([{
-      field: 'category',
-      value: 'All'
-    }, {
-      field: 'status',
-      value: 'All'
-    }]);
+    field: 'category',
+    value: 'All'
+  }, {
+    field: 'status',
+    value: 'All'
+  }]);
 
   private _pagination = new BehaviorSubject<{ maxEvents: number, page: number, maxPages: number }>({
     maxEvents: 10,
@@ -30,7 +30,7 @@ export class EventsService {
     direction: 'asc',
   });
 
-  private _modalSettings = new BehaviorSubject<{ event: MyEvent | null, mode: string}>({
+  private _modalSettings = new BehaviorSubject<{ event: MyEvent | null, mode: string }>({
     event: null,
     mode: 'closed'
   });
@@ -87,8 +87,10 @@ export class EventsService {
     return {category: newState[0], status: newState[1]};
   }
 
-  setMaxEvents(count: number){
-    if(count < 0) return;
+  setMaxEvents(count: number) {
+    if (count < 0) {
+      return;
+    }
 
     const p = this._pagination.value;
     const newPage = Math.floor((p.page * p.maxEvents) / count);
@@ -103,10 +105,12 @@ export class EventsService {
     return {...newPaginationState};
   }
 
-  changePage(next: boolean){
+  changePage(next: boolean) {
     const p = this._pagination.value;
 
-    if((next && p.page === p.maxPages - 1) || (!next && p.page === 0)) return;
+    if ((next && p.page === p.maxPages - 1) || (!next && p.page === 0)) {
+      return;
+    }
 
     const newPage = (p.page + (next ? 1 : -1));
     const newPaginationState = {
@@ -120,16 +124,19 @@ export class EventsService {
     return {...newPaginationState};
   }
 
-  setPage(page: number){
+  setPage(page: number) {
     const p = this._pagination.value;
 
-    if(page < 0){
+    if (page < 0) {
       return {changed: !(page < 0 && p.page === 0), pagination: {...p, page: 0}};
+    } else if (page >= p.maxPages) {
+      return {
+        changed: !(page > p.maxPages - 1 && p.page === p.maxPages - 1),
+        pagination: {...p, page: p.maxPages - 1}
+      };
+    } else if (page === p.page) {
+      return {changed: false, pagination: {...p}};
     }
-    else if(page >= p.maxPages){
-      return {changed: !(page > p.maxPages - 1 && p.page === p.maxPages - 1), pagination: {...p, page: p.maxPages - 1}};
-    }
-    else if (page === p.page) return {changed: false, pagination: {...p}};
 
     const newPaginationState = {
       page: page,
@@ -146,7 +153,7 @@ export class EventsService {
     const newState = {
       field,
       direction: s.field === field ? (s.direction === 'asc' ? 'desc' : 'asc') : 'asc'
-    }
+    };
     this._sorting.next(newState);
     return {...newState};
   }
@@ -159,27 +166,27 @@ export class EventsService {
     this._modalSettings.next({
       event: event || null,
       mode
-    })
+    });
   }
 
-  closeModal(){
+  closeModal() {
     this._modalSettings.next({
       event: null,
       mode: 'closed'
     });
   }
 
-  addEvent(event: MyEvent){
-    console.log('new event:', event)
-    this._eventsSubject.next([event, ...this._eventsSubject.value])
+  addEvent(event: MyEvent) {
+    console.log('new event:', event);
+    this._eventsSubject.next([event, ...this._eventsSubject.value]);
   }
 
-  editEvent(event: MyEvent){
+  editEvent(event: MyEvent) {
     this._eventsSubject.next(this._eventsSubject.value.map((e) => e.uid === event.uid ? event : e));
   }
 
-  deleteEvent(event: MyEvent){
-    this._eventsSubject.next(this._eventsSubject.value.filter(e => e.uid !== event.uid ));
+  deleteEvent(event: MyEvent) {
+    this._eventsSubject.next(this._eventsSubject.value.filter(e => e.uid !== event.uid));
   }
 
   //endregion modal
@@ -250,11 +257,11 @@ export class EventsService {
 
   //region debug
 
-  debugFilters(){
+  debugFilters() {
     return this._filters;
   }
 
-  debugPagination(){
+  debugPagination() {
     return this._pagination;
   }
 

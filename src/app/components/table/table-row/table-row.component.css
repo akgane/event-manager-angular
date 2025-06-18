@@ -1,0 +1,12 @@
+.title-row{
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+
+  .title-info{
+    padding-left: 10px;
+    color: gray;
+    font-size: 12px;
+    align-self: center;
+  }
+}

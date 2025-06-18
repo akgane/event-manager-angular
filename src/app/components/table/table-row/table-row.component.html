@@ -6,8 +6,10 @@
 <td
   [ngClass]="{'bg-gray': index % 2 !== 0}"
   style="text-align: left; cursor: pointer"
-  (click)="openModal('edit', event)">
-  {{ event.title }}
+  (click)="openModal('edit', event)"
+  class="title-row">
+  <p>{{ event.title }}</p>
+  <p class="title-info">Click to see description</p>
 </td>
 <td
   [ngClass]="{'bg-gray': index % 2 !== 0}">{{ event.date }}
