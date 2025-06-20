@@ -1,0 +1,20 @@
+div{
+  display: flex;
+  border-radius: 5px;
+  border: 1px solid black;
+  height: 10px;
+
+  .pb-fill{
+    border: none;
+    border-radius: 0;
+    background-color: royalblue;
+    justify-content: center;
+  }
+
+  .pb-text{
+    align-self: center;
+    justify-self: center;
+    color: white;
+    font-size: 10px;
+  }
+}
