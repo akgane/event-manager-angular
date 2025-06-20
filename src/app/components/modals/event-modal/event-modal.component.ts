@@ -3,6 +3,7 @@ import {MyEvent} from '../../../models/event.model';
 import {FormBuilder, FormGroup, Validators} from '@angular/forms';
 import {v4 as uuidv4} from 'uuid';
 import {isBefore, isSameDay} from 'date-fns';
+import {EventsService} from '../../../services/events.service';
 
 
 @Component({
@@ -19,26 +20,43 @@ export class EventModalComponent implements OnInit {
   @Input() mode: string;
   @Input() event: MyEvent | null;
 
-  constructor(private formBuilder: FormBuilder) {
-  }
+  constructor(private formBuilder: FormBuilder,
+              private eventsService: EventsService) {}
 
   ngOnInit(): void {
     this.modalForm =
       (this.event === null || this.event === undefined)
         ? this.formBuilder.group({
           title: ['', [Validators.required, Validators.maxLength(40)]],
-          description: ['', [Validators.required, Validators.maxLength(200)]],
+          description: ['', [Validators.maxLength(200)]],
           category: ['Event', Validators.required],
           status: ['Planned', Validators.required],
           date: ['', Validators.required]
         })
         : this.formBuilder.group({
           title: [this.event.title, [Validators.required, Validators.maxLength(40)]],
-          description: [this.event.description, [Validators.required, Validators.maxLength(200)]],
+          description: [this.event.description, [Validators.maxLength(200)]],
           category: [this.event.category, Validators.required],
           status: [this.event.status, Validators.required],
           date: [this.event.date, Validators.required]
         });
+
+    this.eventsService.serverActions$.subscribe(actions => {
+      if(this.event == null) return;
+      if(actions[this.event.uid] !== undefined){
+        this.inProgress = true;
+        this.pbValue = actions[this.event.uid].progress;
+        this.modalForm.disable();
+
+        if(this.pbValue >= 100) {
+          this.closeModal();
+          this.inProgress = false;
+          this.modalForm.enable();
+          delete actions[this.event.uid];
+        }
+      }
+    })
+
   }
 
   modalForm: FormGroup;
@@ -46,6 +64,9 @@ export class EventModalComponent implements OnInit {
     show: false,
     errors: []
   };
+
+  inProgress = false;
+  pbValue = 0;
 
   fieldValidations = [
     {
@@ -64,10 +85,6 @@ export class EventModalComponent implements OnInit {
     {
       field: 'description',
       checks: [
-        {
-          error: 'required',
-          message: 'Description is required'
-        },
         {
           error: 'maxlength',
           message: 'Maximum 200 characters'
@@ -104,6 +121,10 @@ export class EventModalComponent implements OnInit {
   ];
 
   submitForm() {
+    if(this.inProgress) {
+      return;
+    }
+
     this.errorsHandler = {
       show: true,
       errors: this.getErrors()
@@ -126,8 +147,14 @@ export class EventModalComponent implements OnInit {
       date: form['date'],
     };
 
+    if(this.mode === 'add') this.event = event;
+
+    if(this.mode === 'edit' && JSON.stringify(event) == JSON.stringify(this.event)) {
+      this.closeModal();
+      return;
+    }
+
     this.submitEvent(event);
-    this.closeModal();
   }
 
   getError(field: string) {

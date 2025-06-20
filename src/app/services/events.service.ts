@@ -4,14 +4,15 @@ import {mockEvents} from '../data/mock-data';
 import {map} from 'rxjs/operators';
 import {isBefore, parseISO} from 'date-fns';
 import {Injectable} from '@angular/core';
+import {ServerHandlerService} from './server-handler.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EventsService {
-  private _eventsSubject = new BehaviorSubject<MyEvent[]>(mockEvents);
+  private _eventsSubject = new BehaviorSubject<MyEvent[]>([]);
 
-  private _filters = new BehaviorSubject<{ field: string, value: string }[]>([{
+  private _filtersSubject = new BehaviorSubject<{ field: string, value: string }[]>([{
     field: 'category',
     value: 'All'
   }, {
@@ -19,28 +20,47 @@ export class EventsService {
     value: 'All'
   }]);
 
-  private _pagination = new BehaviorSubject<{ maxEvents: number, page: number, maxPages: number }>({
+  private _paginationSubject = new BehaviorSubject<{ maxEvents: number, page: number, maxPages: number }>({
     maxEvents: 10,
     page: 0,
     maxPages: Math.ceil(this._eventsSubject.value.length / 10)
   });
 
-  private _sorting = new BehaviorSubject<{ field: string, direction: string }>({
+  private _sortingSubject = new BehaviorSubject<{ field: string, direction: string }>({
     field: '',
     direction: 'asc',
   });
 
-  private _modalSettings = new BehaviorSubject<{ event: MyEvent | null, mode: string }>({
+  private _modalSettingsSubject = new BehaviorSubject<{ event: MyEvent | null, mode: string }>({
     event: null,
     mode: 'closed'
   });
 
-  public events$ = this._eventsSubject.asObservable();
-  public filters$ = this._filters.asObservable();
-  public pagination$ = this._pagination.asObservable();
-  public sorting$ = this._sorting.asObservable();
+  private _serverActionsSubject = new BehaviorSubject({});
 
-  public modalSettings$ = this._modalSettings.asObservable();
+  public events$ = this._eventsSubject.asObservable();
+  public filters$ = this._filtersSubject.asObservable();
+  public pagination$ = this._paginationSubject.asObservable();
+  public sorting$ = this._sortingSubject.asObservable();
+
+  public modalSettings$ = this._modalSettingsSubject.asObservable();
+  public serverActions$ = this._serverActionsSubject.asObservable();
+
+  constructor(private serverHandlerService: ServerHandlerService,) {
+    this.serverHandlerService.getEvents().subscribe((res : {events: MyEvent[]}) => {
+      if(typeof res.events !== undefined){
+        const events = res.events
+        this._eventsSubject.next(events);
+      }
+    })
+
+    this.serverHandlerService.serverActions$.subscribe((actions) => {
+      this._serverActionsSubject.next(actions);
+      // Object.keys(actions).forEach(key => {
+      //   console.log(actions[key].progress);
+      // });
+    })
+  }
 
   //region events
 
@@ -79,11 +99,11 @@ export class EventsService {
   //region gui
 
   setFilter(field: string, value: string) {
-    const newState = this._filters.value.map(f =>
+    const newState = this._filtersSubject.value.map(f =>
       f.field === field
         ? {field, value: value}
         : f);
-    this._filters.next(newState);
+    this._filtersSubject.next(newState);
     return {category: newState[0], status: newState[1]};
   }
 
@@ -92,7 +112,7 @@ export class EventsService {
       return;
     }
 
-    const p = this._pagination.value;
+    const p = this._paginationSubject.value;
     const newPage = Math.floor((p.page * p.maxEvents) / count);
 
     const newPaginationState = {
@@ -101,12 +121,12 @@ export class EventsService {
       maxEvents: count
     };
 
-    this._pagination.next(newPaginationState);
+    this._paginationSubject.next(newPaginationState);
     return {...newPaginationState};
   }
 
   changePage(next: boolean) {
-    const p = this._pagination.value;
+    const p = this._paginationSubject.value;
 
     if ((next && p.page === p.maxPages - 1) || (!next && p.page === 0)) {
       return;
@@ -119,13 +139,13 @@ export class EventsService {
       maxEvents: p.maxEvents,
     };
 
-    this._pagination.next(newPaginationState);
+    this._paginationSubject.next(newPaginationState);
 
     return {...newPaginationState};
   }
 
   setPage(page: number) {
-    const p = this._pagination.value;
+    const p = this._paginationSubject.value;
 
     if (page < 0) {
       return {changed: !(page < 0 && p.page === 0), pagination: {...p, page: 0}};
@@ -144,17 +164,17 @@ export class EventsService {
       maxEvents: p.maxEvents,
     };
 
-    this._pagination.next(newPaginationState);
+    this._paginationSubject.next(newPaginationState);
     return {changed: true, pagination: {...newPaginationState}};
   }
 
   setSort(field: string) {
-    const s = this._sorting.value;
+    const s = this._sortingSubject.value;
     const newState = {
       field,
       direction: s.field === field ? (s.direction === 'asc' ? 'desc' : 'asc') : 'asc'
     };
-    this._sorting.next(newState);
+    this._sortingSubject.next(newState);
     return {...newState};
   }
 
@@ -163,26 +183,28 @@ export class EventsService {
   //region modal
 
   openModal(mode: string, event?: MyEvent) {
-    this._modalSettings.next({
+    this._modalSettingsSubject.next({
       event: event || null,
       mode
     });
   }
 
   closeModal() {
-    this._modalSettings.next({
+    this._modalSettingsSubject.next({
       event: null,
       mode: 'closed'
     });
   }
 
   addEvent(event: MyEvent) {
-    console.log('new event:', event);
-    this._eventsSubject.next([event, ...this._eventsSubject.value]);
+    // console.log('new event:', event);
+    // this._eventsSubject.next([event, ...this._eventsSubject.value]);
+    this.serverHandlerService.addEvent(event);
   }
 
   editEvent(event: MyEvent) {
-    this._eventsSubject.next(this._eventsSubject.value.map((e) => e.uid === event.uid ? event : e));
+    // this._eventsSubject.next(this._eventsSubject.value.map((e) => e.uid === event.uid ? event : e));
+    this.serverHandlerService.editEvent(event);
   }
 
   deleteEvent(event: MyEvent) {
@@ -258,11 +280,11 @@ export class EventsService {
   //region debug
 
   debugFilters() {
-    return this._filters;
+    return this._filtersSubject;
   }
 
   debugPagination() {
-    return this._pagination;
+    return this._paginationSubject;
   }
 
   //endregion debug

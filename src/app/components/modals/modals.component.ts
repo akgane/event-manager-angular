@@ -12,18 +12,33 @@ export class ModalsComponent {
     this.eventsService.modalSettings$.subscribe((settings) => {
       this.modalSettings = settings;
     });
+
+    this.eventsService.serverActions$.subscribe((actions) => {
+      this.inProgress
+        = this.modalSettings.event != null
+        && actions[this.modalSettings.event.uid] !== undefined;
+      console.log(this.inProgress);
+    })
   }
 
   modalSettings = {
-    mode: 'close',
+    mode: 'closed',
     event: null
   };
 
+  inProgress = false;
+
   closeModal = () => {
     this.eventsService.closeModal();
+    this.modalSettings = {
+      mode: 'closed',
+      event: null
+    };
+    this.inProgress = false;
   }
 
   submitEvent = (event: MyEvent) => {
+    this.modalSettings.event = event;
     switch (this.modalSettings.mode) {
       case 'add':
         this.eventsService.addEvent(event);
@@ -32,12 +47,10 @@ export class ModalsComponent {
         this.eventsService.editEvent(event);
         break;
     }
-    this.closeModal();
   }
 
   submitDeletion = (event: MyEvent) => {
     this.eventsService.deleteEvent(event);
-    this.closeModal();
   }
 
   getModalTitle = () => {

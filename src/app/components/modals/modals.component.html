@@ -1,4 +1,4 @@
-<div class="modal-container" *ngIf="modalSettings.mode !== 'closed'" (click)="closeModal()">
+<div class="modal-container" *ngIf="modalSettings.mode !== 'closed'" (click)="inProgress ? null : closeModal()">
   <app-event-modal *ngIf="modalSettings.mode === 'add' || modalSettings.mode === 'edit'"
                    [closeModal]="closeModal"
                    [submitEvent]="submitEvent"

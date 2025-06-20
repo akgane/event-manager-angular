@@ -26,6 +26,12 @@
       font-size: 16px;
     }
 
+    button:disabled{
+      background-color: gray;
+      color: dimgray;
+      cursor: initial;
+    }
+
     .submit-button {
       width: 40%;
       background-color: royalblue;

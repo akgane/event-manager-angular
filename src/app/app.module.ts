@@ -12,7 +12,8 @@ import { DebugPanelComponent } from './components/debug-panel/debug-panel.compon
 import { EventModalComponent } from './components/modals/event-modal/event-modal.component';
 import { DeleteModalComponent } from './components/modals/delete-modal/delete-modal.component';
 import { ModalsComponent } from './components/modals/modals.component';
-import { PaginationButtonComponent } from './components/top-panel/pagination-button/pagination-button.component';
+import {HttpClientModule} from '@angular/common/http';
+import { ProgressBarComponent } from './components/modals/progress-bar/progress-bar.component';
 
 @NgModule({
   declarations: [
@@ -25,12 +26,13 @@ import { PaginationButtonComponent } from './components/top-panel/pagination-but
     EventModalComponent,
     DeleteModalComponent,
     ModalsComponent,
-    PaginationButtonComponent
+    ProgressBarComponent,
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpClientModule,
   ],
   providers: [
     EventsService,

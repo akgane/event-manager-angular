@@ -3,7 +3,7 @@
   (click)="$event.preventDefault(); $event.stopPropagation()">
   <div class="event-top">
     <p>{{ getModalTitle() }}</p>
-    <a (click)="closeModal()">X</a>
+    <a (click)="inProgress ? null : closeModal()">X</a>
   </div>
   <div class="event-body">
     <form [formGroup]="modalForm" (ngSubmit)="submitForm()">
@@ -64,8 +64,9 @@
       </div>
 
       <div class="button-container">
-        <button class="submit-button" (click)="submitForm()">Submit</button>
+        <button class="submit-button" (click)="submitForm()" [disabled]="inProgress">Submit</button>
       </div>
     </form>
+    <app-progress-bar *ngIf="inProgress" [value]="pbValue"></app-progress-bar>
   </div>
 </div>
