@@ -1,6 +1,5 @@
 import {MyEvent} from '../models/event.model';
 import {BehaviorSubject, combineLatest} from 'rxjs';
-import {mockEvents} from '../data/mock-data';
 import {map} from 'rxjs/operators';
 import {isBefore, parseISO} from 'date-fns';
 import {Injectable} from '@angular/core';
@@ -10,6 +9,7 @@ import {ServerHandlerService} from './server-handler.service';
   providedIn: 'root'
 })
 export class EventsService {
+  //region observable subjects
   private _eventsSubject = new BehaviorSubject<MyEvent[]>([]);
 
   private _filtersSubject = new BehaviorSubject<{ field: string, value: string }[]>([{
@@ -38,6 +38,10 @@ export class EventsService {
 
   private _serverActionsSubject = new BehaviorSubject({});
 
+  //endregion observable subjects
+
+  //region observables
+
   public events$ = this._eventsSubject.asObservable();
   public filters$ = this._filtersSubject.asObservable();
   public pagination$ = this._paginationSubject.asObservable();
@@ -46,7 +50,10 @@ export class EventsService {
   public modalSettings$ = this._modalSettingsSubject.asObservable();
   public serverActions$ = this._serverActionsSubject.asObservable();
 
+  //endregion observables
+
   constructor(private serverHandlerService: ServerHandlerService,) {
+    //get events on application start
     this.serverHandlerService.getEvents().subscribe((res : {events: MyEvent[]}) => {
       if(typeof res.events !== undefined){
         const events = res.events
@@ -54,11 +61,9 @@ export class EventsService {
       }
     })
 
+    //subscription for server actions (add, edit, delete)
     this.serverHandlerService.serverActions$.subscribe((actions) => {
       this._serverActionsSubject.next(actions);
-      // Object.keys(actions).forEach(key => {
-      //   console.log(actions[key].progress);
-      // });
     })
   }
 
@@ -125,6 +130,7 @@ export class EventsService {
     return {...newPaginationState};
   }
 
+  //change page (next, previous)
   changePage(next: boolean) {
     const p = this._paginationSubject.value;
 
@@ -144,6 +150,7 @@ export class EventsService {
     return {...newPaginationState};
   }
 
+  //set exact page
   setPage(page: number) {
     const p = this._paginationSubject.value;
 
@@ -197,18 +204,19 @@ export class EventsService {
   }
 
   addEvent(event: MyEvent) {
-    // console.log('new event:', event);
-    // this._eventsSubject.next([event, ...this._eventsSubject.value]);
+    this._eventsSubject.next([event, ...this._eventsSubject.value]);
     this.serverHandlerService.addEvent(event);
   }
 
   editEvent(event: MyEvent) {
-    // this._eventsSubject.next(this._eventsSubject.value.map((e) => e.uid === event.uid ? event : e));
+    this._eventsSubject.next(this._eventsSubject.value.map((e) => e.uid === event.uid ? event : e));
     this.serverHandlerService.editEvent(event);
   }
 
   deleteEvent(event: MyEvent) {
     this._eventsSubject.next(this._eventsSubject.value.filter(e => e.uid !== event.uid));
+    this.serverHandlerService.deleteEvent(event);
+    this.closeModal();
   }
 
   //endregion modal

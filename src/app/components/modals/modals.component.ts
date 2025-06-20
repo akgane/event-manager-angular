@@ -9,10 +9,12 @@ import {MyEvent} from '../../models/event.model';
 })
 export class ModalsComponent {
   constructor(private eventsService: EventsService) {
+    //modal state subscription
     this.eventsService.modalSettings$.subscribe((settings) => {
       this.modalSettings = settings;
     });
 
+    //server actions subscription
     this.eventsService.serverActions$.subscribe((actions) => {
       this.inProgress
         = this.modalSettings.event != null
@@ -21,13 +23,20 @@ export class ModalsComponent {
     })
   }
 
+  //region variables
+
   modalSettings = {
     mode: 'closed',
     event: null
   };
-
   inProgress = false;
 
+  //endregion variables
+
+
+  //region functions
+
+  //close modal window
   closeModal = () => {
     this.eventsService.closeModal();
     this.modalSettings = {
@@ -37,6 +46,7 @@ export class ModalsComponent {
     this.inProgress = false;
   }
 
+  //submit form with event
   submitEvent = (event: MyEvent) => {
     this.modalSettings.event = event;
     switch (this.modalSettings.mode) {
@@ -49,10 +59,12 @@ export class ModalsComponent {
     }
   }
 
+  //submit form for event deletion
   submitDeletion = (event: MyEvent) => {
     this.eventsService.deleteEvent(event);
   }
 
+  //get modal window title depending on modal state (mode)
   getModalTitle = () => {
     switch (this.modalSettings.mode) {
       case 'add':
@@ -64,4 +76,6 @@ export class ModalsComponent {
     }
     return '';
   }
+
+  //endregion functions
 }

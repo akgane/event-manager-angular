@@ -21,15 +21,17 @@
   [ngClass]="{'bg-gray': index % 2 !== 0}">{{ event.status }}
 </td>
 <td
-  [ngClass]="{'bg-gray': index % 2 !== 0}"
-  style="color: royalblue; cursor: pointer"
-    (click)="openModal('edit', event)">
-  Edit
+  [ngClass]="{'bg-gray': index % 2 !== 0}">
+  <a (click)="openModal('edit', event)"
+     style="color: royalblue; cursor: pointer; user-select: none;">
+    Edit
+  </a>
 </td>
 <td
-  [ngClass]="{'bg-gray': index % 2 !== 0}"
-  style="color: red; cursor:pointer;"
-  (click)="openModal('delete', event)">
-  Delete
+  [ngClass]="{'bg-gray': index % 2 !== 0}">
+  <a (click)="openModal('delete', event)"
+     style="color: red; cursor:pointer; user-select: none;">
+    Delete
+  </a>
 </td>
 

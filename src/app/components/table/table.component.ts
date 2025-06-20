@@ -14,12 +14,17 @@ export class TableComponent{
     })
   }
 
+  //region variables
+
   sortState = {
     field: '',
     direction: 'asc'
   }
-
   eventsToShow: MyEvent[] = [];
+
+  //endregion variables
+
+  //region functions
 
   setSort(field: string){
     this.sortState = this.eventsService.setSort(field);
@@ -34,4 +39,6 @@ export class TableComponent{
   openModal = (mode: string, event?: MyEvent) => {
     this.eventsService.openModal(mode, event);
   }
+
+  //endregion functions
 }

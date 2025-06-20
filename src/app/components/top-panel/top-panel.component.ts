@@ -11,6 +11,8 @@ export class TopPanelComponent {
     this.pagination = this.eventsService.setMaxEvents(10);
   }
 
+  //region variables
+
   categoryFilter ='All';
   statusFilter = 'All';
   pagination = {
@@ -18,6 +20,10 @@ export class TopPanelComponent {
     maxEvents: 10,
     maxPages: 1
   };
+
+  //endregion variables
+
+  //region functions
 
   changeFilter(field: string, value: string) {
     const newState = this.eventsService.setFilter(field, value);
@@ -43,4 +49,6 @@ export class TopPanelComponent {
   openModal(){
     this.eventsService.openModal('add');
   }
+
+  //endregion functions
 }

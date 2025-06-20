@@ -13,7 +13,6 @@ import {EventsService} from '../../../services/events.service';
   host: {style: 'display: contents'}
 })
 export class EventModalComponent implements OnInit {
-
   @Input() closeModal: () => void;
   @Input() submitEvent: (event: MyEvent) => void;
   @Input() getModalTitle: () => string;
@@ -24,6 +23,7 @@ export class EventModalComponent implements OnInit {
               private eventsService: EventsService) {}
 
   ngOnInit(): void {
+    //set default form fields depending on modal window mode
     this.modalForm =
       (this.event === null || this.event === undefined)
         ? this.formBuilder.group({
@@ -41,6 +41,7 @@ export class EventModalComponent implements OnInit {
           date: [this.event.date, Validators.required]
         });
 
+    //server actions subscription
     this.eventsService.serverActions$.subscribe(actions => {
       if(this.event == null) return;
       if(actions[this.event.uid] !== undefined){
@@ -58,6 +59,8 @@ export class EventModalComponent implements OnInit {
     })
 
   }
+
+  //region variables
 
   modalForm: FormGroup;
   errorsHandler: { show: boolean, errors: { field: string, message: string }[] } = {
@@ -120,11 +123,18 @@ export class EventModalComponent implements OnInit {
     }
   ];
 
+  //endregion variables
+
+  //region functions
+
+  //called on modal window submit button pressed
   submitForm() {
+    //prevent multiple actions
     if(this.inProgress) {
       return;
     }
 
+    //form errors
     this.errorsHandler = {
       show: true,
       errors: this.getErrors()
@@ -138,6 +148,7 @@ export class EventModalComponent implements OnInit {
 
     const form = this.modalForm.value;
 
+    //create MyEvent object based on form values
     const event: MyEvent = {
       uid: this.mode === 'add' ? uuidv4() : this.event.uid,
       title: form['title'],
@@ -149,6 +160,7 @@ export class EventModalComponent implements OnInit {
 
     if(this.mode === 'add') this.event = event;
 
+    //if user didn't change any field in edit mode
     if(this.mode === 'edit' && JSON.stringify(event) == JSON.stringify(this.event)) {
       this.closeModal();
       return;
@@ -157,11 +169,13 @@ export class EventModalComponent implements OnInit {
     this.submitEvent(event);
   }
 
+  //get error message based on field
   getError(field: string) {
     const error = this.errorsHandler.errors.find(err => err.field === field);
     return error ? error.message : null;
   }
 
+  //check and save form errors
   private getErrors() {
     const errors: { field: string, message: string }[] = [];
 
@@ -187,4 +201,6 @@ export class EventModalComponent implements OnInit {
 
     return errors;
   }
+
+  //endregion functions
 }
